@@ -1,4 +1,6 @@
-const jkjm = {
-    "jklkjlk": [12, 56, 22],
-    "jsadlkjalk": 22,
-};
+
+
+/* comentario 
+de varias
+ lineas
+*/
