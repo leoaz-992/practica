@@ -13,7 +13,6 @@
   
 
 // Mostrar el valor obtenido
-  echo " el servidor es $servidor";
 
   $connection = mysqli_connect($servidor, $usuario, $contrasena, $database);
   // ! verifica que exista conexión con la base de datos
@@ -35,7 +34,7 @@
 
   // ! envia la consulta a la base de datos
   if(mysqli_query($connection, $sql_insert)){
-    echo 'datos guardados';
+    echo "<script>console.log('datos guardados')</script>";
   }else{
     echo 'error en la insercion: ' . mysqli_error($connection);
   }
