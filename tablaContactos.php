@@ -1,31 +1,31 @@
 <?php
-  //! codigo para poder usar dotenv y variables de entorno
-  require __DIR__ . '/vendor/autoload.php';
-  $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-  $dotenv->load();
-  
-  // Todo: vatiable con conexion a la base de datos
-  $usuario = $_ENV['DB_USERNAME'];
-  $contrasena = $_ENV['DB_PASSWORD'];
-  $servidor = $_ENV['DB_HOST'];
-  $database = $_ENV['DB_DATABASE'];
-  
+//! codigo para poder usar dotenv y variables de entorno
+require __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+
+// Todo: vatiable con conexion a la base de datos
+$usuario = $_ENV['DB_USERNAME'];
+$contrasena = $_ENV['DB_PASSWORD'];
+$servidor = $_ENV['DB_HOST'];
+$database = $_ENV['DB_DATABASE'];
+
 
 // Mostrar el valor obtenido
 
-  $connection = mysqli_connect($servidor, $usuario, $contrasena, $database);
-  // ! verifica que exista conexión con la base de datos
-  if(!$connection){
-    die('Conexion fallida: ' . mysqli_connect_error());
-  }
-  echo '<script> console.log("estas conectado a mysql")</script>';
+$connection = mysqli_connect($servidor, $usuario, $contrasena, $database);
+// ! verifica que exista conexión con la base de datos
+if (!$connection) {
+  die('Conexion fallida: ' . mysqli_connect_error());
+}
+echo '<script> console.log("estas conectado a mysql")</script>';
 
 
-  $sql_data = "SELECT * FROM `tabla_01_contactos`;";
+$sql_data = "SELECT * FROM `tabla_01_contactos`;";
 
-  $resultado_consulta= mysqli_query($connection,$sql_data)or die('fallo la consulta.');
+$resultado_consulta = mysqli_query($connection, $sql_data) or die('fallo la consulta.');
 
-  
+
 ?>
 
 
@@ -41,7 +41,8 @@
 </head>
 
 <body>
-  <div class="container">
+  <div class="container py-2">
+    <a class="btn btn-primary my-2" href="http://localhost/practicas/practica/index.html">añdir contacto</a>
     <table class="table table-dark table-striped pt-2 mt-2">
       <thead>
         <tr>
@@ -52,19 +53,23 @@
         </tr>
       </thead>
       <tbody>
-          <?php
-          
-            while( $contacto_data = mysqli_fetch_array($resultado_consulta)){
-              echo "<tr>";
-              echo "<th scope='row'>" . $contacto_data['tabla01_ID'] . "</th>";
-              echo "<td>" . $contacto_data['tabla01_nombre'] . "</td>";
-              echo"<td>". $contacto_data['tabla01_email'] ."</td>";
-              echo "<td>". $contacto_data['tabla01_mensaje'] ."</td>";
-              echo "</tr>";
-            };
-
-            mysqli_close($connection);
-          ?>
+        <?php
+        // ! verifia que el resultado consulta no sea un array vacio
+        if (mysqli_num_rows($resultado_consulta) > 0) {
+          // ! recorre el array y lo imprime en una fila de la tabla
+          while ($contacto_data = mysqli_fetch_array($resultado_consulta)) {
+            echo "<tr>";
+            echo "<th scope='row'>" . $contacto_data['tabla01_ID'] . "</th>";
+            echo "<td>" . $contacto_data['tabla01_nombre'] . "</td>";
+            echo "<td>" . $contacto_data['tabla01_email'] . "</td>";
+            echo "<td>" . $contacto_data['tabla01_mensaje'] . "</td>";
+            echo "</tr>";
+          }
+        } else {
+          echo "<tr><td colspan='3'>No hay contactos disponibles.</td></tr>";
+        }
+        mysqli_close($connection);
+        ?>
       </tbody>
     </table>
   </div>
