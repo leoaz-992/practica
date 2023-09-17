@@ -1,18 +1,14 @@
 <?php
-
 //! codigo para poder usar dotenv y variables de entorno
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-// Todo: vatiable con conexion a la base de datos
+// Todo: vatiable de entorno para  conexion a la base de datos
 $usuario = $_ENV['DB_USERNAME'];
 $contrasena = $_ENV['DB_PASSWORD'];
 $servidor = $_ENV['DB_HOST'];
 $database = $_ENV['DB_DATABASE'];
-
-
-// Mostrar el valor obtenido
 
 $connection = mysqli_connect($servidor, $usuario, $contrasena, $database);
 // ! verifica que exista conexión con la base de datos
@@ -21,22 +17,16 @@ if (!$connection) {
 }
 echo '<script> console.log("estas conectado a mysql")</script>';
 
-// * guardas los datos recibidos del formulario del front en variables
+// * obtiene el valor del id y lo transforma e un número
+$id_contact = intval($_GET["id"]);
 
+//* realiza la consulta sql
+#$sql_data="SELECT * FROM `tabla_01_contactos` WHERE `tabla01_ID`=". $id_contact;
+$sql_delete = "DELETE FROM tabla_01_contactos WHERE `tabla_01_contactos`.`tabla01_ID` =" . $id_contact;
 
-$nombre = $_POST["nombre"];
-$email = $_POST["email"];
-$mensaje = $_POST['mensaje'];
-
-
-// * crea una consulta para insertar un dato en la tabla contactos
-$sql_insert = " INSERT INTO tabla_01_contactos(tabla01_nombre, tabla01_email, tabla01_mensaje) VALUES ('$nombre', '$email', '$mensaje')";
-
-// ! envia la consulta a la base de datos
-$resultado_consulta = mysqli_query($connection, $sql_insert);
+$resultado_consulta = mysqli_query($connection, $sql_delete) or die('fallo la consulta.');
 
 mysqli_close($connection);
-
 ?>
 <!DOCTYPE html>
 <html lang="es-Ar">
@@ -61,7 +51,7 @@ mysqli_close($connection);
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
               <form action="tablaContactos.php" method="get">
-                <button class="btn btn-primary" type="submit">Lista de contacto</button>
+                <button class="btn btn-primary mx-2" type="submit">Lista de contacto</button>
               </form>
             </li>
             <li>
@@ -71,16 +61,13 @@ mysqli_close($connection);
         </div>
       </div>
     </nav>
-  </div>
-  <?php
-  if ($resultado_consulta) {
-    echo "<h1>Contacto creado!</h1>";
-    echo "<script>console.log('datos guardados')</script>";
-  } else {
-    echo '<h1 class="text-danger">No se pudo guardar los datos.</h1>';
-    echo '<script>console.log(error en la insercion: ' . mysqli_error($connection) . ')</script>';
-  } ?>
 
+    <?php
+    if ($resultado_consulta) {
+      echo "<h1>contacto con id: " . $id_contact . " eliminado!</h1>";
+    }
+    ?>
+  </div>
 </body>
 
 </html>
