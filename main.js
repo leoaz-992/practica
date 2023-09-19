@@ -1,6 +1,0 @@
-
-
-/* comentario 
-de varias
- lineas
-*/
