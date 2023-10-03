@@ -19,5 +19,5 @@
   if (!$connection) {
     die('Conexion fallida: ' . mysqli_connect_error());
   }
-  echo '<script> console.log("estas conectado a mysql")</script>';
+  /* echo '<script> console.log("estas conectado a mysql")</script>'; */
 ?>
