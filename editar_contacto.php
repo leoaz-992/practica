@@ -1,70 +1,61 @@
-<?php
-  //! codigo para poder usar dotenv y variables de entorno
-  require __DIR__ . '/vendor/autoload.php';
-  $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-  $dotenv->load();
-  
-  // Todo: vatiable con conexion a la base de datos
-  $usuario = $_ENV['DB_USERNAME'];
-  $contrasena = $_ENV['DB_PASSWORD'];
-  $servidor = $_ENV['DB_HOST'];
-  $database = $_ENV['DB_DATABASE'];
-  
+<?php include("includes/head.php");
+include('db_conn.php');
 
-// Mostrar el valor obtenido
 
-  $connection = mysqli_connect($servidor, $usuario, $contrasena, $database);
-  // ! verifica que exista conexión con la base de datos
-  if(!$connection){
-    die('Conexion fallida: ' . mysqli_connect_error());
+if(isset($_POST['update_contact'])){
+  $id = $_GET['id'];
+  $nombre = $_POST['nombre'];
+  $email = $_POST['email'];
+  $description = $_POST['mensaje'];
+
+  $update_query= "UPDATE tabla_01_contactos SET tabla01_nombre ='$nombre',tabla01_email='$email',tabla01_mensaje='$description' WHERE `tabla01_ID`= $id";
+  $resul_consulta = mysqli_query($connection, $update_query);
+  if (!$resul_consulta) {
+    die('fallo la consulta.');
   }
-  echo '<script> console.log("estas conectado a mysql")</script>';
+  mysqli_close($connection);
 
-  // * obtiene el valor del id y lo transforma e un número
-$id_contact = intval($_GET["id"]);
+  $_SESSION['mensaje']= "contacto <strong>$email</strong> editado.";
+  $_SESSION['mensaje_color']= 'info';
+  header("Location: index.php");
+}
 
-//* realiza la consulta sql
-$sql_data="SELECT * FROM `tabla_01_contactos` WHERE `tabla01_ID`=". $id_contact;
-
-$resultado_consulta= mysqli_query($connection,$sql_data)or die('fallo la consulta.');
+if (isset($_GET['id'])) {
+  $id = $_GET['id'];
+  $sql_query = "SELECT * FROM tabla_01_contactos WHERE `tabla_01_contactos`.`tabla01_ID` = $id";
+  $resul_consulta = mysqli_query($connection, $sql_query);
+  if (!$resul_consulta) {
+    die('fallo la consulta.');
+  }
+  if (mysqli_num_rows($resul_consulta) == 1) {
+    $row = mysqli_fetch_array($resul_consulta);
+    $nombre = $row['tabla01_nombre'];
+    $email = $row['tabla01_email'];
+    $description = $row['tabla01_mensaje'];
+  }
+}
 
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>formulario editar contacto</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
-</head>
-<body><!-- -->
-  <div class="container">
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">app contactos</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <form action="tablaContactos.php" method="get">
-                <button class="btn btn-primary ms-4" type="submit">Lista de contacto</button>
-              </form>
-            </li>
-          </ul>
+<?php include('includes/nav.php'); ?>
+<div class="container p-4">
+  <div class="row">
+    <div class="col-md-6 mx-auto">
+      <div class="card">
+        <div class="card-header text-center">
+          Editar Contacto: <strong><?= $email ?></strong>
         </div>
+        <form class="card-body" action="editar_contacto.php?id=<?=$id?>" method="post">
+          <input class="form-control my-2" type="text" name="nombre" id="nombre" value="<?= $nombre ?>" placeholder="ingrese su nombre" autofocus>
+          <input class="form-control my-2" type="email" name="email" id="email" value="<?= $email ?>" placeholder="ingrese su email">
+          <textarea class="form-control" name="mensaje" id="mensaje" cols="30" rows="3"><?= $description ?></textarea>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end my-2">
+            <input class="btn btn-primary" name="update_contact" type="submit" value="Editar Datos">
+          </div>
+        </form>
       </div>
-    </nav>
-    <form class="" action=".php" method="post">
-      <input class="form-control my-2" type="text" name="nombre" id="nombre" placeholder="ingrese su nombre">
-      <input class="form-control my-2" type="email" name="email" id="email" placeholder="ingrese su email">
-      <textarea class="form-control" name="mensaje" id="mensaje" cols="30" rows="4"></textarea>
-      <div class="d-grid gap-2 d-md-flex justify-content-md-end my-2">
-        <input class="btn btn-primary" type="submit" value="enviar Datos">
-      </div>
-    </form>
+    </div>
   </div>
-</body>
-</html>
+</div>
+
+
+<?php include('includes/footer.php'); ?>
